@@ -1,3 +1,0 @@
-tpcc_trace.csv filter=lfs diff=lfs merge=lfs -text
-tpcc.db filter=lfs diff=lfs merge=lfs -text
-tpcc.sql filter=lfs diff=lfs merge=lfs -text

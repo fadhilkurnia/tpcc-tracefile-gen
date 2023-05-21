@@ -2,6 +2,8 @@
 
 import subprocess
 import json
+import shutil
+import os
 
 # for each transaction in tpcc, record:
 #   - transaction id: increasing number
@@ -16,14 +18,16 @@ import json
 
 tpcc_queries_loc = 'tpcc.sql'
 tpcc_database = 'tpcc.db'
-tpcc_exec_time = {'NEW_ORDER': 33782426.12, 'PAYMENT': 19475533.72, 'ORDER_STATUS': 180900.34, 'STOCK_LEVEL': 748386.86, 'DELIVERY': 3290294.41}
+tpcc_database_run = 'tpcc_run.db'
+shutil.copy(tpcc_database, tpcc_database_run)
+tpcc_exec_time = {'NEW_ORDER': 33958328.01, 'PAYMENT': 18908170.22, 'ORDER_STATUS': 188177.59, 'STOCK_LEVEL': 783442.97, 'DELIVERY': 3598365.55}
 result_loc = 'tpcc_trace.csv'
 result_file = open(result_loc, 'w')
 result_file.write(f'tx_id,tx_type,queries,exec_time(us),state_diff_list\n')
 
 def get_state_diff(tx_id, tx_type, queries):
     # run the query, and record the pwrite syscalls
-    subprocess.run(f'sudo ltrace -o raw -Sf sqlite3 {tpcc_database} "{queries}"', shell=True)
+    subprocess.run(f'sudo ltrace -o raw -Sf sqlite3 {tpcc_database_run} "{queries}"', shell=True)
     # gather the state diffs
     temp_raw_file = open("raw")
     filtered_lines = []
@@ -78,3 +82,4 @@ for l in tpcc_queries_file:
 
 tpcc_queries_file.close()
 result_file.close()
+os.remove(tpcc_database_run)
